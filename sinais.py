@@ -1,3 +1,9 @@
+import cv2
+import numpy
+import glob
+import random
+import math
+
 def distancia_euclidiana(matriz1, matriz2):
     retorno = 0
     for i in range(len(matriz1)):
