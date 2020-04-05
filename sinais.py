@@ -1,3 +1,12 @@
+def distancia_euclidiana(matriz1, matriz2):
+    retorno = 0
+    for i in range(len(matriz1)):
+        for j in range(len(matriz1[0])):
+            retorno += (int(matriz2[i][j])- int(matriz1[i][j]))**2
+            if (retorno < 0):
+                retorno *= -1
+    return math.sqrt(retorno)
+
 def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI,area):
     menorDistanciaAux = None
     distancia = None
@@ -49,15 +58,7 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI,area):
         indiceI, indiceA, indiceJ = i,a,j
     return menorDistancia,indiceI,indiceA,indiceJ
 
-def distancia_euclidiana(matriz1, matriz2):
-    retorno = 0
-    for i in range(len(matriz1)):
-        for j in range(len(matriz1[0])):
-            retorno += (int(matriz2[i][j])- int(matriz1[i][j]))**2
-            if (retorno < 0):
-                retorno *= -1
-    return math.sqrt(retorno)
-def teste
+
 
 QNT = 40
 QUAD = 4
