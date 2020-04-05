@@ -13,10 +13,38 @@ def distancia_euclidiana(matriz1, matriz2):
                 retorno *= -1
     return math.sqrt(retorno)
 
-def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI,area):
+def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI):
     menorDistanciaAux = None
     distancia = None
-    
+
+    if(indiceDoTeste == 5):
+        moduloReal = 0
+        moduloImaginario = 0
+
+        moduloTesteReal = 0
+        moduloTesteImaginario = 0
+
+        moduloArea = 0
+        moduloTeste = 0
+
+        linhas  = len(parteReal)
+        colunas = len(parteReal[0])
+        for i in range(linhas):
+            for j in range(colunas):
+                moduloReal += (int(parteReal[i][j]))**2
+                if(moduloReal < 0):
+                    moduloReal *= -1
+        moduloReal = math.sqrt(moduloReal)
+        
+        linhas = len(parteImaginaria)
+        colunas = len(parteImaginaria[0])
+        for i in range(linhas):
+            for j in range(colunas):
+                moduloImaginario += (int(parteImaginaria[i][j]))**2
+                if(moduloImaginario < 0):
+                    moduloImaginario *= -1
+        moduloImaginario = math.sqrt(moduloImaginario)
+        
     for a in range(QNT):
         for j in range(9):
             magnitudeTeste = imagensDeTeste[a][j]
@@ -29,16 +57,16 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI,area):
             if(indiceDoTeste == 1):
                 parteRealAreaTeste = numpy.real(areaTeste)
                 distancia = distancia_euclidiana(parteReal,parteRealAreaTeste)
-            else if(indiceDoTeste == 2):
+            elif(indiceDoTeste == 2):
                 parteImaginariaTeste = numpy.imag(areaTeste)
                 distancia = distancia_euclidiana(parteImaginaria,parteImaginariaTeste)
-            else if(indiceDoTeste == 3):
+            elif(indiceDoTeste == 3):
                 parteRealAreaTeste = numpy.real(areaTeste)
                 parteImaginariaTeste = numpy.imag(areaTeste)
 
                 distancia = distancia_euclidiana(parteReal,parteRealAreaTeste)
                 distancia += distancia_eulidiana(parteImaginaria,parteImaginariaTeste)
-            else if(indiceDoTeste == 4):
+            elif(indiceDoTeste == 4):
                 parteRealAreaTeste = numpy.real(areaTeste)
                 parteImaginariaTeste = numpy.imag(areaTeste)
                 distancia = distancia_euclidiana(parteReal,parteRealAreaTeste)
@@ -55,7 +83,31 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI,area):
                 distancia = distancia_euclidiana(parteImaginaria,parteImaginariaTeste)
                 if(distancia < menorDistanciaAux):
                     menorDistanciaAux = distancia
-                distancia = menorDistanciaAux                
+                distancia = menorDistanciaAux
+            elif(indiceDoTeste == 5):
+                parteRealAreaTeste = numpy.real(areaTeste)
+                parteImaginariaTeste = numpy.imag(areaTeste)
+
+                linhas = len(parteReal)
+                colunas = len(parteReal[0])
+                for linha in range(linhas):
+                    for coluna in range(colunas):
+                        moduloTesteReal += (int(parteRealTeste[linha][coluna]))**2
+                        if(moduloTesteReal < 0):
+                            moduloTesteReal *= -1
+                moduloTesteReal = math.sqrt(moduloTesteReal)
+
+                linhas = len(parteImaginaria)
+                colunas = len(parteImaginaria[0])
+                for linha in range(linhas):
+                    for coluna in range(colunas):
+                        moduloTesteImaginario += (int(parteImaginariaTeste[linha][coluna]))**2
+                        if(moduloTesteImaginario < 0):
+                            moduloTesteImaginario *= -1
+                moduloTesteImaginario = math.sqrt(moduloTesteImaginario)
+
+                distancia = math.sqrt(((moduloTesteReal + moduloTesteImaginario)-(moduloReal + moduloImaginario))**2)
+                
 
     if(menorDistancia == None):
         menorDistancia = distancia
@@ -98,8 +150,8 @@ for i in range(QNT):
         if (a == imagemAleatoria):
             urlsImgsEscolhidas[i] = imagemAleatoria
             imagensSorteadas[i] = fftshift
-        print("Passo 2.4 - Se não for a imagem sorteada, só guarda em URL e imagens de teste")
         else:
+            print("Passo 2.4 - Se não for a imagem sorteada, só guarda em URL e imagens de teste")
             urlsImgsDeTeste[i].append(a)
             imagensDeTeste[i].append(fftshift)
 
@@ -123,3 +175,8 @@ for i in range(QNT):
             acertos[testes] += 1
         else:
             erros[testes] += 1
+
+print("RESULTADO")
+for i in range(len(acertos)):
+    print("Acertos %d: %d" %((i+1),acertos[i]))
+    print("Erros %d: %d" %((i+1),erros[i]))
