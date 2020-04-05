@@ -14,6 +14,7 @@ def distancia_euclidiana(matriz1, matriz2):
     return math.sqrt(retorno)
 
 def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI):
+    menorDistancia = None
     menorDistanciaAux = None
     distancia = None
 
@@ -52,7 +53,7 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI):
             linhas,colunas = magnitudeTeste.shape
             cLinha,cColuna = linhas//2,colunas//2
 
-            areaTeste = magnitudeTeste[clinha-QUAD:clinha+QUAD, ccoluna-QUAD:ccoluna+QUAD]
+            areaTeste = magnitudeTeste[cLinha-QUAD:cLinha+QUAD, cColuna-QUAD:cColuna+QUAD]
 
             if(indiceDoTeste == 1):
                 parteRealAreaTeste = numpy.real(areaTeste)
@@ -65,7 +66,7 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI):
                 parteImaginariaTeste = numpy.imag(areaTeste)
 
                 distancia = distancia_euclidiana(parteReal,parteRealAreaTeste)
-                distancia += distancia_eulidiana(parteImaginaria,parteImaginariaTeste)
+                distancia += distancia_euclidiana(parteImaginaria,parteImaginariaTeste)
             elif(indiceDoTeste == 4):
                 parteRealAreaTeste = numpy.real(areaTeste)
                 parteImaginariaTeste = numpy.imag(areaTeste)
@@ -73,7 +74,7 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI):
                 if(menorDistanciaAux == None):
                     menorDistanciaAux = distancia
                 if(distancia < menorDistanciaAux):
-                    menorDistanciaAux = valor
+                    menorDistanciaAux = distancia
                 distancia = distancia_euclidiana(parteReal,parteImaginariaTeste)
                 if(distancia < menorDistanciaAux):
                     menorDistanciaAux = distancia
@@ -92,7 +93,7 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI):
                 colunas = len(parteReal[0])
                 for linha in range(linhas):
                     for coluna in range(colunas):
-                        moduloTesteReal += (int(parteRealTeste[linha][coluna]))**2
+                        moduloTesteReal += (int(parteRealAreaTeste[linha][coluna]))**2
                         if(moduloTesteReal < 0):
                             moduloTesteReal *= -1
                 moduloTesteReal = math.sqrt(moduloTesteReal)
@@ -113,7 +114,7 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI):
         menorDistancia = distancia
     if(distancia <= menorDistancia):
         menorDistancia = distancia
-        indiceI, indiceA, indiceJ = i,a,j
+        indiceI, indiceA, indiceJ = indiceI,a,j
     return menorDistancia,indiceI,indiceA,indiceJ
 
 
@@ -121,11 +122,11 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI):
 QNT = 40
 QUAD = 4
 
-imagensOrlFaces    = []*QNT
-imagensSorteadas   = []*QNT
-imagensDeTeste     = []*QNT
-urlsImgsEscolhidas = []*QNT
-urlsImgsDeTeste    = []*QNT
+imagensOrlFaces    = [None]*QNT
+imagensSorteadas   = [None]*QNT
+imagensDeTeste     = [[]]*QNT
+urlsImgsEscolhidas = [None]*QNT
+urlsImgsDeTeste    = [[]]*QNT
 
 erros   = [0]*5
 acertos = [0]*5
@@ -133,50 +134,46 @@ acertos = [0]*5
 print("Passo 1 - Pegando as URLs")
 #Pega todas as URLS
 for i in range(1,QNT+1):
-    imagensOrlFaces[i] = glob.iglob("orl_faces\orl_faces\s" +i+ "\*")
+    string = "orl_faces\orl_faces\s"+str(i)+"\*"
+    imagensOrlFaces[i-1] = glob.iglob(string)
 
 print("Passo 2 - Sorteando e convertendo imagens")
 #Sorteia uma imagem, pega todas as imagens e transforma, compara se ela é a aleatória
 for i in range(QNT):
-    print("Passo 2.1 - Sorteando uma imagem")
-    imagemAleatoria = "orl_faces\orl_faces\s"+(i+1)+"\\"+random.randint(1,10)+".pgm"
-    for a in imagensOrlFaces:
-        print("Passo 2.2 - Transformando as demais imagens")
+    imagemAleatoria = "orl_faces\orl_faces\s"+str(i+1)+"\\"+str(random.randint(1,10))+".pgm"
+    for a in imagensOrlFaces[i]:        
         imagem = cv2.imread(a,cv2.IMREAD_GRAYSCALE) #carrega a imagem
         imagemTransformada = numpy.fft.fft2(imagem)
         fftshift = numpy.fft.fftshift(imagemTransformada)
-
-        print("Passo 2.3 - Se for a imagem sorteada, coloca nas URL de imagens escolhidas")
         if (a == imagemAleatoria):
             urlsImgsEscolhidas[i] = imagemAleatoria
             imagensSorteadas[i] = fftshift
         else:
-            print("Passo 2.4 - Se não for a imagem sorteada, só guarda em URL e imagens de teste")
             urlsImgsDeTeste[i].append(a)
             imagensDeTeste[i].append(fftshift)
 
 
-
+print("Passo 3 - Testando e comparando")
 for i in range(QNT):
     menorDistancia = None
     
     magnitudeEscolhida = imagensSorteadas[i]
 
     linhas, colunas = magnitudeEscolhida.shape
-    cLinha,cColunas = linhas//2, colunas//2
+    cLinha, cColuna = linhas//2, colunas//2
 
     area = magnitudeEscolhida[cLinha-QUAD:cLinha+QUAD, cColuna-QUAD:cColuna+QUAD]
     parteReal = numpy.real(area)
     parteImaginaria = numpy.imag(area)
 
     for testes in range(5):
-        menorDistancia,indiceI,indiceA,indiceJ = realizaTeste(testes+1,parteReal,parteImaginaria,i,area)
+        menorDistancia,indiceI,indiceA,indiceJ = realiza_teste(testes+1,parteReal,parteImaginaria,i)
         if(indiceI == indiceA):
             acertos[testes] += 1
         else:
             erros[testes] += 1
 
-print("RESULTADO")
+print("\n\nRESULTADO\n")
 for i in range(len(acertos)):
-    print("Acertos %d: %d" %((i+1),acertos[i]))
-    print("Erros %d: %d" %((i+1),erros[i]))
+    print("Acertos do teste %d: %d" %((i+1),acertos[i]))
+    print("Erros do teste %d: %d\n" %((i+1),erros[i]))
