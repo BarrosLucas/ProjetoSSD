@@ -1,8 +1,31 @@
+"""
+UNIVERSIDADE FEDERAL DA PARAÍBA
+Engenheria de Computação
+Sinais e Sistemas Dinâmicos
+
+ALUNOS:
+    Daniel de Sá Pires
+    Júlio Leite Tavares Neto
+    Lucas Freitas de Barros
+"""
+
+
 import cv2
 import numpy
 import glob
 import random
 import math
+
+def inicializando():
+    for i in range(40):
+        imagensOrlFaces.append([])
+        imagensSorteadas.append([])
+        imagensDeTeste.append([])
+        urlsImgsEscolhidas.append([])
+        urlsImgsDeTeste.append([])
+        url = "orl_faces\orl_faces\s"+str(i+1)+"\*"
+        imagensOrlFaces[i] = glob.iglob(url)
+
 
 def distancia_euclidiana(matriz1, matriz2):
     retorno = 0
@@ -110,11 +133,12 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI):
                 distancia = math.sqrt(((moduloTesteReal + moduloTesteImaginario)-(moduloReal + moduloImaginario))**2)
                 
 
-    if(menorDistancia == None):
-        menorDistancia = distancia
-    if(distancia <= menorDistancia):
-        menorDistancia = distancia
-        indiceI, indiceA, indiceJ = indiceI,a,j
+            if(menorDistancia == None):
+                menorDistancia = distancia
+                indiceI, indiceA, indiceJ = indiceI,a,j
+            if(distancia < menorDistancia):
+                menorDistancia = distancia
+                indiceI, indiceA, indiceJ = indiceI,a,j
     return menorDistancia,indiceI,indiceA,indiceJ
 
 
@@ -122,20 +146,19 @@ def realiza_teste(indiceDoTeste,parteReal,parteImaginaria,indiceI):
 QNT = 40
 QUAD = 4
 
-imagensOrlFaces    = [None]*QNT
-imagensSorteadas   = [None]*QNT
-imagensDeTeste     = [[]]*QNT
-urlsImgsEscolhidas = [None]*QNT
-urlsImgsDeTeste    = [[]]*QNT
+imagensOrlFaces    = []
+imagensSorteadas   = []
+imagensDeTeste     = []
+urlsImgsEscolhidas = []
+urlsImgsDeTeste    = []
 
 erros   = [0]*5
 acertos = [0]*5
 
+
 print("Passo 1 - Pegando as URLs")
 #Pega todas as URLS
-for i in range(1,QNT+1):
-    string = "orl_faces\orl_faces\s"+str(i)+"\*"
-    imagensOrlFaces[i-1] = glob.iglob(string)
+inicializando()
 
 print("Passo 2 - Sorteando e convertendo imagens")
 #Sorteia uma imagem, pega todas as imagens e transforma, compara se ela é a aleatória
@@ -175,5 +198,6 @@ for i in range(QNT):
 
 print("\n\nRESULTADO\n")
 for i in range(len(acertos)):
-    print("Acertos do teste %d: %d" %((i+1),acertos[i]))
-    print("Erros do teste %d: %d\n" %((i+1),erros[i]))
+    print("#-- TESTE %d --#" %(i+1))
+    print("Acertos: %d" %(acertos[i]))
+    print("Erros: %d\n" %(erros[i]))
